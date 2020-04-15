@@ -13,7 +13,6 @@ class Blockchain(object):
         self.chain = []
         self.current_transactions = []
 
-        # Create the genesis block
         self.new_block(previous_hash=1, proof=100)
 
     def new_block(self, proof, previous_hash=None):
@@ -63,16 +62,13 @@ class Blockchain(object):
         hash_value = hashlib.sha256(guess).hexdigest()
         print(hash_value)
 # Change valid_proof to require 6 leading zeros
-        return hash_value[:3] == '000000'
+        return hash_value[:6] == '000000'
 
 
-# Instantiate our Node
 app = Flask(__name__)
 
-# Generate a globally unique address for this node
 node_identifier = str(uuid4()).replace('-', '')
 
-# Instantiate the Blockchain
 blockchain = Blockchain()
 
 # Modify the mine endpoint to instead receive
@@ -83,29 +79,29 @@ def mine():
     # Use data = request.get_json() to pull the data out of the POST
     data = request.get_json()
     # Check that 'proof', and 'id' are present
-    proof = data.get('proof')
-    id = data.get('id')
-    if proof and id:
+
+    if not data['proof'] and not data['id']:
         response = {
             'message': 'new block'
         }
         return jsonify(response), 200
     else:
         response = {
-            'message': 'Proof and ID not present'
+            'error': 'Proof and ID not present'
         }
         return jsonify(response), 400
-    #print('We shall now mine a block!')
-    #proof = blockchain.proof_of_work(blockchain.last_block)
-    #print(f'After a long process, we got a value {proof}')
+
+    # print('We shall now mine a block!')
+    # proof = blockchain.proof_of_work(blockchain.last_block)
+    # print(f'After a long process, we got a value {proof}')
 
     # Forge the new Block by adding it to the chain with the proof
-    new_block = blockchain.new_block(proof)
-    response = {
-        'block': new_block
-    }
+    # new_block = blockchain.new_block(proof)
+    # response = {
+    #    'block': new_block
+    # }
 
-    return jsonify(response), 200
+    # return jsonify(response), 200
 
 
 @app.route('/chain', methods=['GET'])
@@ -119,7 +115,10 @@ def full_chain():
 # Add an endpoint called last_block that returns the last block in the chain
 @app.route('/last_block', methods=['GET'])
 def last_block():
-    return last_block()
+    response = {
+        'last_block': blockchain.last_block
+    }
+    return jsonify(response), 200
 
 
 # Run the program on port 5000
