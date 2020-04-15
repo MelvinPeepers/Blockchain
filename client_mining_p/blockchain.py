@@ -46,7 +46,7 @@ class Blockchain(object):
         return self.chain[-1]
 
 # Remove the proof_of_work function from the server
-    #def proof_of_work(self, block):
+    # def proof_of_work(self, block):
     #    block_string = json.dumps(block, sort_keys=True)
     #    proof = 0
     #    while self.valid_proof(block_string, proof) is False:
@@ -65,6 +65,7 @@ class Blockchain(object):
 # Change valid_proof to require 6 leading zeros
         return hash_value[:3] == '000000'
 
+
 # Instantiate our Node
 app = Flask(__name__)
 
@@ -74,15 +75,29 @@ node_identifier = str(uuid4()).replace('-', '')
 # Instantiate the Blockchain
 blockchain = Blockchain()
 
-# Modify the mine endpoint to instead receive 
+# Modify the mine endpoint to instead receive
 # and validate or reject a new proof sent by a client.
 # It should accept a POST
-@app.route('/mine', methods=['POST'])
+@app.route('/mine', methods=['GET', 'POST'])
 def mine():
-    # Run the proof of work algorithm to get the next proof
-    print('We shall now mine a block!')
-    proof = blockchain.proof_of_work(blockchain.last_block)
-    print(f'After a long process, we got a value {proof}')
+    # Use data = request.get_json() to pull the data out of the POST
+    data = request.get_json()
+    # Check that 'proof', and 'id' are present
+    proof = data.get('proof')
+    id = data.get('id')
+    if proof and id:
+        response = {
+            'message': 'new block'
+        }
+        return jsonify(response), 200
+    else:
+        response = {
+            'message': 'Proof and ID not present'
+        }
+        return jsonify(response), 400
+    #print('We shall now mine a block!')
+    #proof = blockchain.proof_of_work(blockchain.last_block)
+    #print(f'After a long process, we got a value {proof}')
 
     # Forge the new Block by adding it to the chain with the proof
     new_block = blockchain.new_block(proof)
@@ -110,4 +125,3 @@ def last_block():
 # Run the program on port 5000
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
-
