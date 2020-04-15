@@ -74,8 +74,10 @@ node_identifier = str(uuid4()).replace('-', '')
 # Instantiate the Blockchain
 blockchain = Blockchain()
 
-
-@app.route('/mine', methods=['GET'])
+# Modify the mine endpoint to instead receive 
+# and validate or reject a new proof sent by a client.
+# It should accept a POST
+@app.route('/mine', methods=['POST'])
 def mine():
     # Run the proof of work algorithm to get the next proof
     print('We shall now mine a block!')
@@ -98,6 +100,11 @@ def full_chain():
         'chain': blockchain.chain
     }
     return jsonify(response), 200
+
+# Add an endpoint called last_block that returns the last block in the chain
+@app.route('/last_block', methods=['GET'])
+def last_block():
+    return last_block()
 
 
 # Run the program on port 5000
