@@ -45,13 +45,14 @@ class Blockchain(object):
     def last_block(self):
         return self.chain[-1]
 
-    def proof_of_work(self, block):
-        block_string = json.dumps(block, sort_keys=True)
-        proof = 0
-        while self.valid_proof(block_string, proof) is False:
-            proof += 1
+# Remove the proof_of_work function from the server
+    #def proof_of_work(self, block):
+    #    block_string = json.dumps(block, sort_keys=True)
+    #    proof = 0
+    #    while self.valid_proof(block_string, proof) is False:
+    #        proof += 1
 
-        return proof
+    #    return proof
 
     @staticmethod
     def valid_proof(block_string, proof):
@@ -61,8 +62,8 @@ class Blockchain(object):
 
         hash_value = hashlib.sha256(guess).hexdigest()
         print(hash_value)
-
-        return hash_value[:3] == '000'
+# Change valid_proof to require 6 leading zeros
+        return hash_value[:3] == '000000'
 
 # Instantiate our Node
 app = Flask(__name__)
