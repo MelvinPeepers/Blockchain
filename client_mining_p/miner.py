@@ -16,7 +16,7 @@ def proof_of_work(block):
 
     block_string = json.dumps(block, sort_keys=True)
     proof = 0
-    while not valid_proof(block_string, proof) is False:
+    while valid_proof(block_string, proof) is False:
         proof += 1
 
     return proof
