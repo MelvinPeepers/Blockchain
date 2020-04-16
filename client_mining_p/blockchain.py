@@ -74,34 +74,45 @@ blockchain = Blockchain()
 # Modify the mine endpoint to instead receive
 # and validate or reject a new proof sent by a client.
 # It should accept a POST
-@app.route('/mine', methods=['GET', 'POST'])
+@app.route('/mine', methods=['POST'])
 def mine():
     # Use data = request.get_json() to pull the data out of the POST
     data = request.get_json()
     # Check that 'proof', and 'id' are present
-
-    if not data['proof'] and not data['id']:
+    if 'id' not in data or 'proof' not in data:
         response = {
-            'message': 'new block'
-        }
-        return jsonify(response), 200
-    else:
-        response = {
-            'error': 'Proof and ID not present'
+            'message': 'missing value'
         }
         return jsonify(response), 400
 
-    # print('We shall now mine a block!')
-    # proof = blockchain.proof_of_work(blockchain.last_block)
-    # print(f'After a long process, we got a value {proof}')
+    proof = data['proof']
+    last_block = blockchain.last_block
+    block_string = json.dumps(last_block, sort_keys=True)
 
-    # Forge the new Block by adding it to the chain with the proof
-    # new_block = blockchain.new_block(proof)
-    # response = {
-    #    'block': new_block
-    # }
+    if blockchain.valid_proof(block_string, proof):
+        # lets mine a new block and return a success!
+        new_block = blockchain.new_block(proof)
+        response = {
+            'block': new_block
+        }
+        return jsonify(response), 200
+    else:
+        # respond with an error message
+        response = {
+            'message': 'Proof is invalid'
+        }
+        return jsonify(response), 200
+        # print('We shall now mine a block!')
+        # proof = blockchain.proof_of_work(blockchain.last_block)
+        # print(f'After a long process, we got a value {proof}')
 
-    # return jsonify(response), 200
+        # Forge the new Block by adding it to the chain with the proof
+        # new_block = blockchain.new_block(proof)
+        # response = {
+        #    'block': new_block
+        # }
+
+        # return jsonify(response), 200
 
 
 @app.route('/chain', methods=['GET'])
@@ -114,7 +125,7 @@ def full_chain():
 
 # Add an endpoint called last_block that returns the last block in the chain
 @app.route('/last_block', methods=['GET'])
-def last_block():
+def return_last_block():
     response = {
         'last_block': blockchain.last_block
     }

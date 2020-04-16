@@ -16,7 +16,7 @@ def proof_of_work(block):
 
     block_string = json.dumps(block, sort_keys=True)
     proof = 0
-    while self.valid_proof(block_string, proof) is False:
+    while not valid_proof(block_string, proof) is False:
         proof += 1
 
     return proof
@@ -50,6 +50,8 @@ if __name__ == '__main__':
     else:
         node = "http://localhost:5000"
 
+    coins_mined = 0
+
     # Load ID
     f = open("my_id.txt", "r")
     id = f.read()
@@ -76,13 +78,18 @@ if __name__ == '__main__':
 
         r = requests.post(url=node + "/mine", json=post_data)
         data = r.json()
-
+        print(data)
+        if 'block' in data:
+            coins_mined += 1
+            print(f"Total coins mined: {coins_mined}")
+        else:
+            print(data['message'])
         # TODO: If the server responds with a 'message' 'New Block Forged'
         # add 1 to the number of coins mined and print it.  Otherwise,
         # print the message from the server.
-        coins = 0
-        if data['message'] == 'New Block Forged':
-            coins += 1
-            print(f'coins mined: {coins}')
-        else:
-            print(data['message'])
+        #coins = 0
+        # if data['message'] == 'New Block Forged':
+        #    coins += 1
+        #    print(f'coins mined: {coins}')
+        # else:
+        #    print(data['message'])
