@@ -33,14 +33,15 @@ def valid_proof(block_string, proof):
     correct number of leading zeroes.
     :return: True if the resulting hash is a valid proof, False otherwise
     """
-    print(f'I will now check if {proof} is valid')
+    #print(f'I will now check if {proof} is valid')
     guess = block_string + str(proof)
     guess = guess.encode()
 
     hash_value = hashlib.sha256(guess).hexdigest()
-    print(hash_value)
+    # print(hash_value)
 # Change valid_proof to require 6 leading zeros
-    return hash_value[:6] == '000000'
+    return hash_value[:3] == '000'
+    # changed to 3 to make it easier
 
 
 if __name__ == '__main__':
@@ -87,9 +88,3 @@ if __name__ == '__main__':
         # TODO: If the server responds with a 'message' 'New Block Forged'
         # add 1 to the number of coins mined and print it.  Otherwise,
         # print the message from the server.
-        #coins = 0
-        # if data['message'] == 'New Block Forged':
-        #    coins += 1
-        #    print(f'coins mined: {coins}')
-        # else:
-        #    print(data['message'])
